@@ -3,37 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EMT-1 現場防錯助手</title>
+    <title>EMT-1 現場防錯助手 v2</title>
     <style>
-        :root { --bg: #121212; --card: #1e1e1e; --primary: #4285f4; --danger: #ea4335; --success: #34a853; --text: #ffffff; }
-        body { font-family: Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        :root {
+            --bg: #121212; --card: #1e1e1e; --primary: #4285f4; --danger: #ea4335;
+            --success: #34a853; --warning: #fbbc05; --text: #ffffff;
+        }
+        body { font-family: Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
         .page { display: none; }
-        .active { display: block; }
-        .btn { width: 100%; padding: 35px 20px; margin: 15px 0; border: none; border-radius: 20px; font-size: 1.8em; font-weight: bold; color: white; cursor: pointer; transition: 0.2s; }
+        .active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        h1, h2 { text-align: center; color: var(--primary); }
+        .btn { width: 100%; padding: 25px 15px; margin: 10px 0; border: none; border-radius: 15px; font-size: 1.4em; font-weight: bold; color: white; cursor: pointer; display: block; text-decoration: none; text-align: center; }
         .btn-blue { background: var(--primary); }
         .btn-red { background: var(--danger); }
         .btn-green { background: var(--success); }
-        .btn-small { padding: 15px; font-size: 1.1em; background: #555; }
-        .card { background: var(--card); padding: 20px; border-radius: 15px; margin-top: 15px; border-left: 8px solid var(--primary); }
-        .step-text { font-size: 1.3em; margin: 15px 0; line-height: 1.5; }
-        select { width: 100%; padding: 15px; font-size: 1.2em; background: #333; color: white; border-radius: 10px; margin: 10px 0; border: 1px solid #555; }
-        .score-box { font-size: 2.5em; text-align: center; color: #fbbc05; margin: 20px 0; font-weight: bold; }
-        .warn { color: var(--danger); text-align: center; font-size: 1.4em; font-weight: bold; }
+        .btn-gray { background: #444; font-size: 1em; padding: 15px; }
+        .card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--primary); }
+        .step { font-size: 1.1em; margin: 12px 0; display: flex; align-items: flex-start; }
+        .step input { transform: scale(1.5); margin-right: 12px; margin-top: 5px; }
+        select { width: 100%; padding: 12px; font-size: 1.1em; background: #333; color: white; border-radius: 10px; margin: 8px 0; border: 1px solid #555; }
+        .score-display { background: #000; padding: 15px; border-radius: 15px; text-align: center; border: 2px solid var(--warning); margin: 15px 0; }
+        .total-score { font-size: 3em; font-weight: bold; color: var(--warning); }
+        .sample-box { color: #fbbc05; font-weight: bold; margin-right: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="p1" class="page active">
-        <h1 style="text-align: center; margin-bottom: 30px;">🚑 接觸傷病患</h1>
-        <button class="btn btn-blue" onclick="show('p-conscious')">👤 有意識</button>
-        <button class="btn btn-red" onclick="show('p-unconscious')">🚫 無意識 (U)</button>
+    <div id="p-main" class="page active">
+        <h1>🚑 接觸傷病患</h1>
+        <button class="btn btn-blue" onclick="showPage('p-conscious')">👤 有意識</button>
+        <button class="btn btn-red" onclick="showPage('p-unconscious')">🚫 無意識 (U)</button>
     </div>
 
     <div id="p-unconscious" class="page">
-        <h2 style="color:var(--danger)">🚨 無意識判定流程</h2>
+        <h2 style="color:var(--danger)">🚨 無意識 (U)</h2>
         <div class="card">
-            <div class="step-text">1. <b>測量脈搏/呼吸</b> (<10秒)</div>
-            <div class="step-text">2. <b>無脈搏：</b> 立即 CPR + AED</div>
+            <div class="step"><input type="checkbox"> <span><b>檢查脈搏/呼吸</b> (<10秒)</span></div>
+            <div class="step"><input type="checkbox"> <span><b>無脈搏：</b>立即 CPR+AED</span></div>
+            <div class="step"><input type="checkbox"> <span><b>有脈搏：</b>維持呼吸道/給氧</span></div>
+        </div>
+        <button class="btn btn-green" onclick="showPage('p-gcs')">下一步：評估 GCS</button>
+    </div>
+
+    <div id="p-conscious" class="page">
+        <h2>✅ 有意識 (ABC)</h2>
+        <div class="card">
+            <div class="step"><input type="checkbox"> <span><b>A：</b>呼吸道暢通</span></div>
+            <div class="step"><input type="checkbox"> <span><b>B：</b>呼吸深淺/給氧</span></div>
+            <div class="step"><input type="checkbox"> <span><b>C：</b>橈動脈/膚色濕冷</span></div>
+        </div>
+        <button class="btn btn-green" onclick="showPage('p-gcs')">下一步：評估 GCS</button>
+    </div>
+
+    <div id="p-gcs" class="page">
+        <h2>📊 GCS 評估</h2>
+        <div class="card">
+            <label>張眼 (E)</label><select id="g-e" onchange="calcG()"><option value="4">4-自動</option><option value="3">3-呼喚</option><option value="2">2-痛刺激</option><option value="1">1-無反應</option></select>
+            <label>語言 (V)</label><select id="g-v" onchange="calcG()"><option value="5">5-正確</option><option value="4">4-錯誤</option><option value="3">3-單詞</option><option value="2">2-聲音</option><option value="1">1-無反應</option></select>
+            <label>運動 (M)</label><select id="g-m" onchange="calcG()"><option value="6">6-遵從</option><option value="5">5-定位痛</option><option value="4">4-正常屈曲</option><option value="3">3-病態屈曲</option><option value="2">2-伸張</option><option value="1">1-無反應</option></select>
+        </div>
+        <div class="score-display">總分 <span class="total-score" id="g-total">15</span><br><span id="g-warn" style="color:var(--danger)"></span></div>
+        <button class="btn btn-blue" onclick="showPage('p-sample')">下一步：詢問病史</button>
+    </div>
+
+    <div id="p-sample" class="page">
+        <h2>📝 詢問病史 (SAMPLE)</h2>
+        <div class="card">
+            <div class="step"><input type="checkbox"> <span><span class="sample-box">S 主訴：</span>哪裡不舒服？</span></div>
+            <div class="step"><input type="checkbox"> <span><span class="sample-box">A 過敏：</span>藥物/食物過敏？</span></div>
+            <div class="step"><input type="checkbox"> <span><span class="sample-box">M 藥物：</span>服用長期藥物？</span></div>
+            <div class="step"><input type="checkbox"> <span><span class="sample-box">P 病史：</span>過去病史？</span></div>
+            <div class="step"><input type="checkbox"> <span><span class="sample-box">L 進食：</span>最後一餐時間？</span></div>
+            <div class="step"><input type="checkbox"> <span><span class="sample-box">E 經過：</span>發生前在做什麼？</span></div>
+        </div>
+        <button class="btn btn-green" onclick="showPage('p-vitals')">下一步：二度評估</button>
+    </div>
+
+    <div id="p-vitals" class="page">
+        <h2>🔍 二度評估與處置</h2>
+        <div class="card">
+            <p style="color:var(--warning)"><b>1. 八大生命徵象：</b></p>
+            <p>意識、呼吸、脈搏、血壓、瞳孔、體溫、膚色、血氧</p>
+            <hr>
+            <p style="color:var(--warning)"><b>2. 詳細全身檢查：</b></p>
+            <p>頭/頸/胸/腹/骨盆/四肢 (是否有傷口、變形)</p>
+        </div>
+        <button class="btn btn-red" onclick="alert('請儘速送醫並回報指揮中心！')">🚨 確認危急度並送醫</button>
+        <button class="btn btn-gray" onclick="location.reload()">重新開始</button>
+    </div>
+
+    <script>
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0,0);
+        }
+        function calcG() {
+            const t = parseInt(document.getElementById('g-e').value) + parseInt(document.getElementById('g-v').value) + parseInt(document.getElementById('g-m').value);
+            document.getElementById('g-total').innerText = t;
+            document.getElementById('g-warn').innerText = (t < 14) ? "⚠️ 危急個案！" : "";
+        }
+    </script>
+</body>
+</html>
             <div class="step-text">3. <b>有脈搏：</b> 維持呼吸道 (OPA/NPA)</div>
         </div>
         <button class="btn btn-green" onclick="show('p-gcs')">下一步：計算 GCS</button>
